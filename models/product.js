@@ -12,12 +12,15 @@ const productSchema= new Schema({
     },
     price: {
         type: Number,
-        required: true
+        required: true,
+        min: 0
     },
-    image: {
-        type: String,
-        required: true
-    },
+    images: [ 
+        {
+            url: String,
+            filename: String
+        }
+    ],
     category: {
         type: String,
         required: true
@@ -27,7 +30,8 @@ const productSchema= new Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: "Review"
         }
-    ]
+    ],
+    default: []
 })
 const Product = mongoose.model('Product', productSchema);
 module.exports = Product;

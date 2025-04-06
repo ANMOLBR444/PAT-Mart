@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product</title>
+</head>
+<body>
+    <h1>Add Product</h1>
+    <form action="/addproduct" method="POST" enctype="multipart/form-data">
+        <label for="name">Product Name:</label><br>
+        <input type="text" id="name" name="product[name]" required><br><br>
+
+        <label for="price">Price:</label><br>
+        <input type="number" id="price" name="product[price]" required><br><br>
+
+        <label for="description">Description:</label><br>
+        <textarea id="description" name="product[description]" required></textarea><br><br>
+
+        <label for="image">Images</label>
+        <input type="file" id="image" name="image" multiple required><br><br>
+
+        <label for="category">Category:</label><br>
+        <select id="category" name="product[category]" required>
+            <option value="electronics">Electronics</option>
+            <option value="clothing">Clothing</option>
+            <option value="home">Home</option>
+            <option value="books">Books</option>
+            <option value="toys">Toys</option>
+            <option value="sports">Sports</option>
+            <option value="beauty">Beauty</option>
+            <option value="health">Health</option>
+            <option value="grocery">Grocery</option>
+            <option value="furniture">Furniture</option>
+
+        <input type="submit" value="Add Product">
+    </form>
+</body>
+</html>

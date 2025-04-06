@@ -1,8 +1,13 @@
 const mongoose = require('mongoose');
 const passportlocalmongoose = require('passport-local-mongoose');
+const user = require('../../../../../Codes/collegeproject/models/user');
 const Schema = mongoose.Schema;
 
 const UserSchema= new Schema({
+    username: {
+        type: String,
+        required: true,
+    },
     email: {
         type: String,
         required: true,

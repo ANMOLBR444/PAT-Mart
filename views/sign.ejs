@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            overflow: hidden;
+        }
+        
+        .tabs {
+            display: flex;
+            background-color: #f9f9f9;
+        }
+        
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            background-color: white;
+            color: #4285f4;
+        }
+        
+        .form-container {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #4285f4;
+        }
+        
+        .button {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 20px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .button:hover {
+            background-color: #3367d6;
+        }
+        
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #777;
+        }
+        
+        .form-footer a {
+            color: #4285f4;
+            text-decoration: none;
+        }
+        
+        .error-message {
+            color: #d93025;
+            margin-top: 5px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .oauth-buttons {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .oauth-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            border: 1px solid #ddd;
+            transition: background-color 0.3s;
+        }
+        
+        .oauth-button:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #777;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .divider span {
+            padding: 0 10px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .phone-input {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .phone-input select {
+            width: 30%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .phone-input input {
+            width: 70%;
+        }
+        
+        .address-section {
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+            margin-top: 20px;
+        }
+        
+        .address-section h3 {
+            margin-bottom: 15px;
+            color: #555;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" id="signin-tab">Sign In</div>
+            <div class="tab" id="signup-tab">Sign Up</div>
+        </div>
+        
+        <div class="form-container">
+            <!-- Sign In Form -->
+            <form action="/login" method="POST" id="signin-form">
+                <% if (locals.error) { %>
+                <div class="error-message" style="display: block;"><%= error %></div>
+                <% } %>
+                
+                <div class="form-group">
+                    <label for="signin-email">Email</label>
+                    <input type="email" id="signin-email" name="email" required>
+                    <div class="error-message" id="signin-email-error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signin-password">Password</label>
+                    <input type="password" id="signin-password" name="password" required>
+                    <div class="error-message" id="signin-password-error"></div>
+                </div>
+                
+                <button type="submit" class="button">Sign In</button>
+                
+                <div class="form-footer">
+                    <a href="/forgot-password">Forgot Password?</a>
+                </div>
+                
+                <div class="divider"><span>OR</span></div>
+                
+                <div class="oauth-buttons">
+                    <a href="/auth/google" class="oauth-button">
+                        Continue with Google
+                    </a>
+                </div>
+            </form>
+            
+            <!-- Sign Up Form -->
+            <form action="/register" method="POST" id="signup-form" class="hidden">
+                <% if (locals.registerError) { %>
+                <div class="error-message" style="display: block;"><%= registerError %></div>
+                <% } %>
+                
+                <div class="form-group">
+                    <label for="signup-name">Full Name</label>
+                    <input type="text" id="signup-name" name="username" required>
+                    <div class="error-message" id="signup-name-error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" name="email" required>
+                    <div class="error-message" id="signup-email-error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <div class="phone-input">
+                        <select id="country-code" name="countryCode" required>
+                            <option value="+1">+1 (US/CA)</option>
+                            <option value="+44">+44 (UK)</option>
+                            <option value="+91">+91 (IN)</option>
+                            <option value="+61">+61 (AU)</option>
+                            <option value="+33">+33 (FR)</option>
+                            <option value="+81">+81 (JP)</option>
+                            <option value="+86">+86 (CN)</option>
+                        </select>
+                        <input type="tel" id="phone" name="phone" placeholder="Phone number" required>
+                    </div>
+                    <div class="error-message" id="phone-error"></div>
+                </div>
+                
+                
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" name="password" required>
+                    <div class="error-message" id="signup-password-error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-confirm-password">Confirm Password</label>
+                    <input type="password" id="signup-confirm-password" name="confirmPassword" required>
+                    <div class="error-message" id="signup-confirm-password-error"></div>
+                </div>
+                
+                <button type="submit" class="button">Sign Up</button>
+                
+                <div class="divider"><span>OR</span></div>
+                
+                <div class="oauth-buttons">
+                    <a href="/auth/google" class="oauth-button">
+                        Continue with Google
+                    </a>
+                </div>
+                
+                <div class="form-footer">
+                    By signing up, you agree to our <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const signinTab = document.getElementById('signin-tab');
+            const signupTab = document.getElementById('signup-tab');
+            const signinForm = document.getElementById('signin-form');
+            const signupForm = document.getElementById('signup-form');
+            
+            // Tab switching
+            signinTab.addEventListener('click', () => {
+                signinTab.classList.add('active');
+                signupTab.classList.remove('active');
+                signinForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+            });
+            
+            signupTab.addEventListener('click', () => {
+                signupTab.classList.add('active');
+                signinTab.classList.remove('active');
+                signupForm.classList.remove('hidden');
+                signinForm.classList.add('hidden');
+            });
+            
+            // Form validation
+            const validateEmail = (email) => {
+                const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return re.test(email.toLowerCase());
+            };
+            
+            const validatePassword = (password) => {
+                return password.length >= 8;
+            };
+            
+            const validatePhone = (phone) => {
+                // Basic phone validation - adjust as needed
+                return /^\d{7,15}$/.test(phone.replace(/\s/g, ''));
+            };
+            
+            const validatePincode = (pincode) => {
+                // Basic postal/zip code validation - adjust for specific country formats
+                return /^[a-zA-Z0-9\s-]{3,10}$/.test(pincode);
+            };
+            
+            // Sign In validation
+            signinForm.addEventListener('submit', (e) => {
+                let isValid = true;
+                const email = document.getElementById('signin-email');
+                const password = document.getElementById('signin-password');
+                const emailError = document.getElementById('signin-email-error');
+                const passwordError = document.getElementById('signin-password-error');
+                
+                // Reset errors
+                emailError.style.display = 'none';
+                passwordError.style.display = 'none';
+                
+                // Validate email
+                if (!validateEmail(email.value)) {
+                    emailError.textContent = 'Please enter a valid email address';
+                    emailError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                // Validate password
+                if (!validatePassword(password.value)) {
+                    passwordError.textContent = 'Password must be at least 8 characters long';
+                    passwordError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+            
+            // Sign Up validation
+            signupForm.addEventListener('submit', (e) => {
+                let isValid = true;
+                const name = document.getElementById('signup-name');
+                const email = document.getElementById('signup-email');
+                const phone = document.getElementById('phone');
+                const country = document.getElementById('country');
+                const city = document.getElementById('city');
+                const pincode = document.getElementById('pincode');
+                const password = document.getElementById('signup-password');
+                const confirmPassword = document.getElementById('signup-confirm-password');
+                
+                const nameError = document.getElementById('signup-name-error');
+                const emailError = document.getElementById('signup-email-error');
+                const phoneError = document.getElementById('phone-error');
+                const countryError = document.getElementById('country-error');
+                const cityError = document.getElementById('city-error');
+                const pincodeError = document.getElementById('pincode-error');
+                const passwordError = document.getElementById('signup-password-error');
+                const confirmPasswordError = document.getElementById('signup-confirm-password-error');
+                
+                // Reset errors
+                nameError.style.display = 'none';
+                emailError.style.display = 'none';
+                phoneError.style.display = 'none';
+                countryError.style.display = 'none';
+                cityError.style.display = 'none';
+                pincodeError.style.display = 'none';
+                passwordError.style.display = 'none';
+                confirmPasswordError.style.display = 'none';
+                
+                // Validate name
+                if (name.value.trim() === '') {
+                    nameError.textContent = 'Name is required';
+                    nameError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                // Validate email
+                if (!validateEmail(email.value)) {
+                    emailError.textContent = 'Please enter a valid email address';
+                    emailError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                // Validate phone
+                if (!validatePhone(phone.value)) {
+                    phoneError.textContent = 'Please enter a valid phone number';
+                    phoneError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                // Validate country
+                if (country.value.trim() === '') {
+                    countryError.textContent = 'Country is required';
+                    countryError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                // Validate city
+                if (city.value.trim() === '') {
+                    cityError.textContent = 'City is required';
+                    cityError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                // Validate pincode
+                if (!validatePincode(pincode.value)) {
+                    pincodeError.textContent = 'Please enter a valid PIN/ZIP code';
+                    pincodeError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                // Validate password
+                if (!validatePassword(password.value)) {
+                    passwordError.textContent = 'Password must be at least 8 characters long';
+                    passwordError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                // Confirm password
+                if (password.value !== confirmPassword.value) {
+                    confirmPasswordError.textContent = 'Passwords do not match';
+                    confirmPasswordError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
